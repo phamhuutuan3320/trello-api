@@ -13,4 +13,9 @@ Router.route('/')
     // nó sẽ chuyển tiếp request tới boardController.createNew thông qua next(), 
     .post(boardValidation.createNew, boardController.createNew)
 
+Router.route('/:id')
+    .get(boardController.getDetails)
+    // Update 1 cai board cu the
+    .put()
+
 export const boardRoute = Router;

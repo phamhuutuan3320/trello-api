@@ -10,14 +10,23 @@ import cleanup from './utils/cleanup';
 // import de lay duoc cac bien moi truong
 import { env } from './config/environment';
 
+// import để phục vụ cho cors
+import cors from 'cors';
+
 // import de phuc vu cho viec routing
 import { APIs_V1 } from '~/routes/v1';
 
 // import cho xu ly loi tap trung voi middleware
 import { errorHandlingMiddleware } from '~/middlewares/errorHandlingMiddleware'
 
+// import corsoption cho cors
+import { corsOptions } from './config/cors';
+
 const START_SERVER = () => {
   const app = express();
+
+
+  app.use(cors(corsOptions));
 
   // Cần 1 thằng middleware để có thể parse được cái json từ body của request
   // Nếu không có thằng này thì request.body sẽ bị undefined

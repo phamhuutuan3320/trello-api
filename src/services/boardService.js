@@ -1,5 +1,10 @@
 import { slugify } from "~/utils/formatters";
 import { boardModel } from "~/models/boardModel";
+import ApiError from "~/utils/ApiError";
+import { StatusCodes } from "http-status-codes";
+import { cloneDeep } from "lodash"
+
+
 const createNew = async (reqBody) => {
     try {
         // Xử lý logic dữ liệu tùy đặc thù dự án
@@ -26,6 +31,34 @@ const createNew = async (reqBody) => {
     }
 }
 
+const getDetails = async (id) => {
+    try {
+        const board = await boardModel.getDetails(id);
+        if(!board) {
+            throw new ApiError(StatusCodes.NOT_FOUND, 'Board not found');
+        }
+
+        // Clone board ra một cái mới để xử lý, không ảnh hưởng tới board ban đầu,
+        const resBoard = cloneDeep(board);
+
+        // đưa card vào đúng column
+        resBoard.columns.forEach(column => {
+
+            // Dùng với toString của js
+            // column.cards = resBoard.cards.filter( card => card.columnId.toString() === column._id.toString())
+
+            // Hoặc là dùng cách dưới, tại vì mongodb hỗ trợ phương thức equals
+            column.cards = resBoard.cards.filter( card => card.columnId.equals(column._id))
+        });
+        // Xóa đi mảng cards nằm ngoài column, vì chúng ta đã đưa vào trong rồi
+        delete resBoard.cards
+        return resBoard;
+    }catch(err) {
+        throw new Error(err);
+    }
+}
+
 export const boardService = {
-    createNew
+    createNew,
+    getDetails
 }
